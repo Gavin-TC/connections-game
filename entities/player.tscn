@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://drlc5t05jcik1"]
+
+[ext_resource type="Script" uid="uid://dx3jqnpqfp0x3" path="res://scripts/player/player.gd" id="1_merdl"]
+[ext_resource type="Texture2D" uid="uid://jvn2tdctoaq1" path="res://assets/entities/player/player.png" id="2_e4p34"]
+[ext_resource type="Script" uid="uid://h1allqkj50la" path="res://scripts/player/player_camera.gd" id="3_e4p34"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e4p34"]
+size = Vector2(9, 13)
+
+[sub_resource type="Gradient" id="Gradient_b0kkn"]
+offsets = PackedFloat32Array(0, 0.9939759, 1)
+colors = PackedColorArray(0.5370113, 0.5370113, 0.5370112, 1, 0.04794085, 0.0481928, 0.03551501, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_e4p34"]
+gradient = SubResource("Gradient_b0kkn")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.125, 0.125)
+
+[node name="Player" type="CharacterBody2D" unique_id=810700332 groups=["Player"]]
+z_index = 999
+script = ExtResource("1_merdl")
+speed = 250.0
+debug_mode = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=954728240]
+unique_name_in_owner = true
+position = Vector2(-0.5, -0.5)
+shape = SubResource("RectangleShape2D_e4p34")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=162693344]
+unique_name_in_owner = true
+texture_filter = 1
+texture = ExtResource("2_e4p34")
+offset = Vector2(0, -1)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1867049486]
+zoom = Vector2(0.75, 0.75)
+script = ExtResource("3_e4p34")
+MIN_ZOOM = 0.5
+MAX_ZOOM = 4.0
+ZOOM_RATE = 10.0
+ZOOM_INC = 1.0
+target_zoom = 1.0
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1863641931]
+scale = Vector2(7, 7)
+shadow_color = Color(0, 0, 0, 1)
+shadow_filter = 1
+texture = SubResource("GradientTexture2D_e4p34")

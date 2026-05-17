@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dlrwjigtwsyqf"]
+
+[ext_resource type="PackedScene" uid="uid://w03r2vnpesrw" path="res://scenes/game.tscn" id="1_o5qli"]
+
+[node name="Main" type="Node2D" unique_id=335780303]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=760031946]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1523272034]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="CanvasLayer/Control" unique_id=425968667]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+stretch_shrink = 4
+
+[node name="SubViewport" type="SubViewport" parent="CanvasLayer/Control/SubViewportContainer" unique_id=726333946]
+transparent_bg = true
+handle_input_locally = false
+canvas_item_default_texture_filter = 0
+size = Vector2i(640, 360)
+render_target_update_mode = 4
+
+[node name="Game" parent="CanvasLayer/Control/SubViewportContainer/SubViewport" unique_id=871261845 instance=ExtResource("1_o5qli")]

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bm1o7c06q4fqx"]
+
+[ext_resource type="Texture2D" uid="uid://b6soarvmqqa6" path="res://assets/entities/pylon.png" id="1_rdcmd"]
+[ext_resource type="Script" uid="uid://d85k0etrhovi" path="res://scripts/entities/pylon.gd" id="1_u2y26"]
+
+[sub_resource type="Gradient" id="Gradient_nmlrr"]
+colors = PackedColorArray(0.71763486, 0.69065326, 0.6180447, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_rdcmd"]
+gradient = SubResource("Gradient_nmlrr")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.125, 0.125)
+
+[node name="Pylon" type="Node2D" unique_id=319199036 groups=["Pylon"]]
+script = ExtResource("1_u2y26")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1003410466]
+texture = ExtResource("1_rdcmd")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1288319750]
+position = Vector2(1, 0)
+scale = Vector2(1.5, 1.5)
+texture = SubResource("GradientTexture2D_rdcmd")
