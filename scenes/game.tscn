@@ -1,9 +1,18 @@
 [gd_scene format=3 uid="uid://w03r2vnpesrw"]
 
+[ext_resource type="Script" uid="uid://clvqqh677d6yr" path="res://scripts/scenes/game.gd" id="1_lbhrr"]
+[ext_resource type="AudioStream" uid="uid://57siro5lahui" path="res://assets/audio/cave_ambience.wav" id="1_lnu2h"]
 [ext_resource type="PackedScene" uid="uid://bdugiihsvtwim" path="res://managers/mine_manager.tscn" id="1_yqjtg"]
 [ext_resource type="PackedScene" uid="uid://drlc5t05jcik1" path="res://entities/player.tscn" id="2_yqjtg"]
 
 [node name="Game" type="Node2D" unique_id=871261845 groups=["WorldRoot"]]
+script = ExtResource("1_lbhrr")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1935063850]
+unique_name_in_owner = true
+stream = ExtResource("1_lnu2h")
+volume_db = -10.0
+bus = &"Reverb bus"
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1638353685]
 color = Color(0.13216871, 0.23252025, 0.34879023, 1)
@@ -11,4 +20,4 @@ color = Color(0.13216871, 0.23252025, 0.34879023, 1)
 [node name="MineManager" parent="." unique_id=1253030551 instance=ExtResource("1_yqjtg")]
 
 [node name="Player" parent="." unique_id=810700332 instance=ExtResource("2_yqjtg")]
-position = Vector2(184, 151)
+position = Vector2(193, 152)

@@ -42,8 +42,9 @@ const ORES: Dictionary[TileType, Dictionary] = {
 	}
 }
 
-var debug_mode: bool = false
+const PYLON_CONNECTION_DISTANCE = 16 * 6 # Distance in pixels
 
+var debug_mode: bool = false
 
 func set_debug_mode(mode: bool):
 	debug_mode = mode

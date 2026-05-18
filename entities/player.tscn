@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://dx3jqnpqfp0x3" path="res://scripts/player/player.gd" id="1_merdl"]
 [ext_resource type="Texture2D" uid="uid://jvn2tdctoaq1" path="res://assets/entities/player/player.png" id="2_e4p34"]
 [ext_resource type="Script" uid="uid://h1allqkj50la" path="res://scripts/player/player_camera.gd" id="3_e4p34"]
+[ext_resource type="Texture2D" uid="uid://cqdsc2kbs76h3" path="res://assets/entities/player/pickaxe_temp.png" id="4_rfe5m"]
+[ext_resource type="AudioStream" uid="uid://c0wovbtovyqx2" path="res://assets/audio/single_stone_hit.wav" id="5_qly61"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_e4p34"]
 size = Vector2(9, 13)
@@ -16,6 +18,92 @@ gradient = SubResource("Gradient_b0kkn")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.125, 0.125)
+
+[sub_resource type="Animation" id="Animation_rfe5m"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PickaxeOrigin:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.7853982]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PickaxeOrigin/PickaxeRotation:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AudioStreamPlayer2D:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_qly61"]
+resource_name = "pickaxe_swing"
+length = 0.25
+step = 0.025
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PickaxeOrigin:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.075, 0.125, 0.25),
+"transitions": PackedFloat32Array(1, 1, 0.06250005, 1, 4.756827),
+"update": 0,
+"values": [-1.0471975511965976, 0.0, 1.0471975511965976, 1.0471975511965976, -1.0471975511965976]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PickaxeOrigin/PickaxeRotation:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [-0.17453292519943295, 0.08726646259971647, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("AudioStreamPlayer2D:playing")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.1, 0.24864611),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qsoyl"]
+_data = {
+&"RESET": SubResource("Animation_rfe5m"),
+&"pickaxe_swing": SubResource("Animation_qly61")
+}
 
 [node name="Player" type="CharacterBody2D" unique_id=810700332 groups=["Player"]]
 z_index = 999
@@ -35,6 +123,7 @@ texture = ExtResource("2_e4p34")
 offset = Vector2(0, -1)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1867049486]
+position = Vector2(0, -1)
 zoom = Vector2(0.75, 0.75)
 script = ExtResource("3_e4p34")
 MIN_ZOOM = 0.5
@@ -48,3 +137,23 @@ scale = Vector2(7, 7)
 shadow_color = Color(0, 0, 0, 1)
 shadow_filter = 1
 texture = SubResource("GradientTexture2D_e4p34")
+
+[node name="PickaxeOrigin" type="Node2D" parent="." unique_id=429763433]
+unique_name_in_owner = true
+visible = false
+rotation = -0.7853982
+
+[node name="PickaxeRotation" type="Node2D" parent="PickaxeOrigin" unique_id=882482663]
+position = Vector2(-1, -11)
+
+[node name="Sprite2D" type="Sprite2D" parent="PickaxeOrigin/PickaxeRotation" unique_id=774120982]
+position = Vector2(0, -6)
+texture = ExtResource("4_rfe5m")
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=609027214]
+stream = ExtResource("5_qly61")
+bus = &"Reverb bus"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=475884215]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_qsoyl")

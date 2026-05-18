@@ -5,7 +5,9 @@ extends CharacterBody2D
 @export var speed: float = 150.0
 @export var jump_force: float = -275.0
 @export var friction: float = 1000.0
-@export var max_view_distance: int = 10
+@export var max_view_distance: int = 5
+## Number of blocks away from the player that the player can mine
+@export var mining_reach: int = 3
 
 @export_category("Debug")
 @export var debug_mode: bool = false
@@ -13,14 +15,22 @@ extends CharacterBody2D
 
 @onready var sprite: Sprite2D = %Sprite2D
 @onready var collision_shape: CollisionShape2D = %CollisionShape2D
+@onready var pickaxe_origin: Node2D = %PickaxeOrigin
+@onready var animation_player: AnimationPlayer = %AnimationPlayer
 
 @onready var mine_manager: MineManager = get_tree().get_first_node_in_group("MineManager")
+
+var oxygen: float = 100.0
+var power: float = 100.0
+
+var connected_to_pylon: bool = false
 
 
 func _ready() -> void:
 	if debug_mode:
 		Global.set_debug_mode(true)
 		collision_shape.disabled = Global.debug_mode
+	mining_reach *= 16
 
 
 func _process(delta):
@@ -40,8 +50,8 @@ func _process(delta):
 	if dir: velocity.x = dir * speed;
 	else:	velocity.x = move_toward(velocity.x, 0.0, friction)
 
-	if dir < 0: sprite.scale = Vector2(-1, 1)
-	if dir > 0: sprite.scale = Vector2( 1, 1)
+	if dir < 0: scale = Vector2(-1, 1)
+	if dir > 0:	scale = Vector2(1, 1)
 
 	move_and_slide()
 	
@@ -63,7 +73,12 @@ func damage_tile(pos: Vector2i) -> void:
 	var stone_layer: TileMapLayer = mine_manager.stone_layer
 	var map_size: Vector2i = stone_layer.get_used_rect().size
 
-	pos = pos / stone_layer.tile_set.tile_size
+	var map_pos = stone_layer.local_to_map(pos)
+	var dist = pos.distance_to(position)
 
-	if pos.x >= 0 and pos.y >= 0 and pos.x <= map_size.x and pos.y <= map_size.y:
-		mine_manager.damage_tile(pos)
+	if map_pos.x >= 0 and map_pos.y >= 0 and map_pos.x <= map_size.x and map_pos.y <= map_size.y and dist < mining_reach:
+		if mine_manager.damage_tile(map_pos):
+			pickaxe_origin.visible = true
+			animation_player.play("pickaxe_swing")
+			await animation_player.animation_finished
+			pickaxe_origin.visible = false

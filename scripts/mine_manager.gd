@@ -6,6 +6,7 @@ extends Node2D
 @export var fog_of_war: bool = true
 @export var do_corners: bool = true
 @export var light_blocking: bool = true
+@export var keep_visited_tiles: bool = false
 
 @onready var fov_layer: TileMapLayer = %FovLayer
 @onready var background_layer: TileMapLayer = %BackgroundLayer
@@ -53,7 +54,7 @@ var ore_atlas: Dictionary[Global.OreType, Array] = {
 var invisible_tiles: Array[Vector2i]
 var visible_tiles: Array[Vector2i]
 var seen_tiles: Array[Vector2i]
-var prev_pos: Vector2i
+var prev_pos: Vector2i # Previous player position local to map
 
 var d: float = 0.0
 
@@ -64,7 +65,7 @@ func _ready() -> void:
 		height = DisplayServer.window_get_size().y / 16
 	
 	for pylon in get_tree().get_nodes_in_group("Pylon"):
-		active_pylons.append(pylon.position / stone_layer.tile_set.tile_size)
+		active_pylons.append(stone_layer.local_to_map(pylon.position))
 	
 	generate_mine(noise_seed)
 	handle_player_fov(true)
@@ -83,15 +84,50 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var sorted_pylons: Array[Vector2i] = active_pylons
+	var sorted_pylons: Array[Vector2i] = active_pylons.duplicate()
+
+	for i in range(sorted_pylons.size()):
+		sorted_pylons[i] = stone_layer.map_to_local(sorted_pylons[i])
+
 	sorted_pylons.sort() # This needs to be sorted by distance
 
 	for i in range(sorted_pylons.size()):
 		if sorted_pylons.size() > 1 and i != sorted_pylons.size() - 1:
-			var top_pylon: Vector2i = sorted_pylons[i] + Vector2i(-1, -7)
-			var top_pylon_next: Vector2i = sorted_pylons[i + 1] + Vector2i(-1, -7)
+			var top_pylon: Vector2i = sorted_pylons[i] + Vector2i(0, -6)
+			var top_pylon_next: Vector2i = sorted_pylons[i + 1] + Vector2i(0, -6)
 
 			draw_line(top_pylon, top_pylon_next, Color.SKY_BLUE)
+	
+	if sorted_pylons.size() > 0:
+		var player_pos: Vector2i = player.position
+		
+		var closest_anchor: Vector2i = sorted_pylons[0] + Vector2i(0, -6)
+		var min_distance: float = player_pos.distance_to(closest_anchor)
+
+		for pylon in sorted_pylons:
+			var pylon_top = pylon + Vector2i(0, -6)
+			var current_distance = player_pos.distance_to(pylon_top)
+			
+			if current_distance < min_distance:
+				min_distance = current_distance
+				closest_anchor = pylon_top
+				
+		for i in range(sorted_pylons.size() - 1):
+			var pylon_a = sorted_pylons[i] + Vector2i(0, -6)
+			var pylon_b = sorted_pylons[i + 1] + Vector2i(0, -6)
+			
+			var closest_point_on_wire = Geometry2D.get_closest_point_to_segment(player_pos, pylon_a, pylon_b)
+			var dist_to_wire = player_pos.distance_to(closest_point_on_wire)
+			
+			if dist_to_wire < min_distance:
+				min_distance = dist_to_wire
+				closest_anchor = closest_point_on_wire
+		
+		if closest_anchor.distance_to(player_pos) <= Global.PYLON_CONNECTION_DISTANCE:
+			player.connected_to_pylon = true
+			draw_line(closest_anchor, player_pos, Color.LIGHT_BLUE)
+		else:
+			player.connected_to_pylon = false
 
 
 func generate_mine(seed: int) -> void:
@@ -246,7 +282,7 @@ func handle_player_fov(forced: bool = false) -> void:
 		if tile not in current_dynamic:
 			if not static_visible_tiles.has(tile):
 				if light_blocking:
-					if tile in seen_tiles:
+					if tile in seen_tiles and keep_visited_tiles:
 						if fov_layer.get_cell_atlas_coords(tile) != visited_tile:
 							fov_layer.set_cell(tile, 0, visited_tile)
 					else:
@@ -328,10 +364,9 @@ func handle_pylon_fov() -> void:
 		if not current_static.has(tile):
 			# Overwrite Check: Only darken if the player IS NOT standing there lighting it
 			if tile not in dynamic_visible_tiles:
-				if light_blocking:
-					if tile in seen_tiles:
-						if fov_layer.get_cell_atlas_coords(tile) != visited_tile:
-							fov_layer.set_cell(tile, 0, visited_tile)
+				if light_blocking and tile in seen_tiles and keep_visited_tiles:
+					if fov_layer.get_cell_atlas_coords(tile) != visited_tile:
+						fov_layer.set_cell(tile, 0, visited_tile)
 					else:
 						if fov_layer.get_cell_atlas_coords(tile) != fov_tile:
 							fov_layer.set_cell(tile, 0, fov_tile)
@@ -405,24 +440,41 @@ func _input(event) -> void:
 		# If the block that is clicked is air and the block beneath it is not
 		if data == null and stone_layer.get_cell_tile_data(stone_layer.local_to_map(pos + Vector2i(0, stone_layer.tile_set.tile_size.y))):
 			var pylon: Pylon = pylon_scene.instantiate()
-			var map_pos = stone_layer.local_to_map(pos) * 16 + Vector2i(8, 8)
-			pylon.position = map_pos
-			active_pylons.append(map_pos)
+			var grid_pos = stone_layer.local_to_map(pos)
+			var pixel_pos = grid_pos * 16 + Vector2i(8, 8)
+			
+			pylon.position = pixel_pos
+			active_pylons.append(grid_pos) # Append the raw grid coordinate for the FOV math
+			
 			get_tree().get_first_node_in_group("WorldRoot").add_child(pylon)
 
 
-func damage_tile(pos: Vector2i) -> void:
+func damage_tile(pos: Vector2i) -> bool:
 	if tile_type.has(pos):
 		tile_type.erase(pos)
 		tile_health.erase(pos)
 		stone_layer.erase_cell(pos)
 		handle_player_fov(true)
 		handle_pylon_fov()
-	else:
+
+		return true
+	elif ore_type.has(pos):
 		ore_type.erase(pos)
 		stone_layer.erase_cell(pos)
 		handle_player_fov(true)
 		handle_pylon_fov()
+
+		return true
+	elif active_pylons.has(pos):
+		for pylon in get_tree().get_nodes_in_group("Pylon"):
+			if stone_layer.local_to_map(pylon.position) == pos:
+				active_pylons.erase(pos)
+				handle_pylon_fov()
+				pylon.queue_free()
+				return true
+
+	return false
+
 
 
 func get_nearest_ore(pos: Vector2i, type: Global.OreType) -> Vector2i:
