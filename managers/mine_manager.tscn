@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://bdugiihsvtwim"]
 
-[ext_resource type="Script" uid="uid://c7rg0gjpegif5" path="res://scripts/mine_manager.gd" id="1_ukvqc"]
+[ext_resource type="Script" uid="uid://cjaua2wiugj0g" path="res://scripts/util/mine_manager.gd" id="1_e20c7"]
+[ext_resource type="Texture2D" uid="uid://dsycg0pokmc2q" path="res://assets/tilemaps/los_fow_tilemap.png" id="2_e20c7"]
 [ext_resource type="Texture2D" uid="uid://b8ukvxxif3mi5" path="res://assets/tilemaps/basic_tilemap.png" id="2_n1jyh"]
+[ext_resource type="AudioStream" uid="uid://2amm7mxtxqpd" path="res://assets/audio/block_explosion.wav" id="3_n1jyh"]
+[ext_resource type="Texture2D" uid="uid://d2kb3vncn2xaf" path="res://assets/tilemaps/damage_tilemap.png" id="4_vdm23"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_e20c7"]
 texture = ExtResource("2_n1jyh")
@@ -11,12 +14,25 @@ texture = ExtResource("2_n1jyh")
 3:0/0 = 0
 0:1/0 = 0
 1:1/0 = 0
+3:1/0 = 0
 0:2/0 = 0
 1:2/0 = 0
 2:2/0 = 0
+2:1/0 = 0
+3:2/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_vdm23"]
 sources/0 = SubResource("TileSetAtlasSource_e20c7")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vdm23"]
+texture = ExtResource("2_e20c7")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_e20c7"]
+sources/0 = SubResource("TileSetAtlasSource_vdm23")
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_ukvqc"]
 polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
@@ -50,32 +66,32 @@ texture = ExtResource("2_n1jyh")
 2:2/0 = 0
 2:2/0/occlusion_layer_0/polygon_0/polygon = SubResource("OccluderPolygon2D_ukvqc")
 2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:1/0 = 0
+2:1/0 = 0
+3:2/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_n1jyh"]
 occlusion_layer_0/light_mask = 1
-physics_layer_0/collision_layer = 1
+physics_layer_0/collision_layer = 3
+physics_layer_0/collision_mask = 3
 sources/0 = SubResource("TileSetAtlasSource_ukvqc")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_n1jyh"]
-texture = ExtResource("2_n1jyh")
-0:0/0 = 0
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_na5qo"]
+texture = ExtResource("4_vdm23")
 1:0/0 = 0
 2:0/0 = 0
 3:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-0:2/0 = 0
-1:2/0 = 0
-2:2/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+0:0/0 = 0
 
-[sub_resource type="TileSet" id="TileSet_e20c7"]
-sources/0 = SubResource("TileSetAtlasSource_n1jyh")
+[sub_resource type="TileSet" id="TileSet_856ts"]
+sources/0 = SubResource("TileSetAtlasSource_na5qo")
 
 [node name="MineManager" type="Node2D" unique_id=1253030551 groups=["MineManager"]]
-script = ExtResource("1_ukvqc")
-width = 250
+script = ExtResource("1_e20c7")
+width = 500
 height = 250
-do_corners = false
 
 [node name="BackgroundLayer" type="TileMapLayer" parent="." unique_id=333276379]
 unique_name_in_owner = true
@@ -83,10 +99,23 @@ z_index = -10
 tile_set = SubResource("TileSet_vdm23")
 collision_enabled = false
 
+[node name="FovLayer" type="TileMapLayer" parent="." unique_id=1052745932]
+unique_name_in_owner = true
+z_index = 10
+tile_set = SubResource("TileSet_e20c7")
+
 [node name="StoneLayer" type="TileMapLayer" parent="." unique_id=1940686036 groups=["StoneLayer"]]
 unique_name_in_owner = true
 tile_set = SubResource("TileSet_n1jyh")
 
-[node name="FovLayer" type="TileMapLayer" parent="." unique_id=1052745932]
+[node name="DamageLayer" type="TileMapLayer" parent="." unique_id=416831558]
 unique_name_in_owner = true
-tile_set = SubResource("TileSet_e20c7")
+z_index = 9
+z_as_relative = false
+tile_set = SubResource("TileSet_856ts")
+
+[node name="TileHitPlayer" type="AudioStreamPlayer" parent="." unique_id=294053892]
+unique_name_in_owner = true
+stream = ExtResource("3_n1jyh")
+volume_db = -15.0
+playback_type = 1

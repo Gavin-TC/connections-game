@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://r74ktxt08sbk"]
+
+[ext_resource type="Script" uid="uid://dfaixa33526jo" path="res://scripts/scenes/block_particles.gd" id="1_ksd7v"]
+
+[node name="BlockParticles" type="Node2D" unique_id=634767421]
+script = ExtResource("1_ksd7v")

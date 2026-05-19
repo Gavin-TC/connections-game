@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://cld04ru52xy43"]
+
+[ext_resource type="Script" uid="uid://6pjjo2nj07a6" path="res://scripts/entities/block_particle.gd" id="1_qu4wd"]
+[ext_resource type="AudioStream" uid="uid://bpb0ybvvavy2e" path="res://assets/audio/pickupCoin.wav" id="2_fv607"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qu4wd"]
+size = Vector2(4, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fv607"]
+size = Vector2(2, 2)
+
+[node name="BlockParticle" type="CharacterBody2D" unique_id=1833165844]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_qu4wd")
+
+[node name="Particle" type="ColorRect" parent="." unique_id=1214056979]
+unique_name_in_owner = true
+z_index = 10
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=821769525]
+unique_name_in_owner = true
+shape = SubResource("RectangleShape2D_qu4wd")
+
+[node name="Area2D" type="Area2D" parent="." unique_id=388486185]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1396473060]
+shape = SubResource("RectangleShape2D_fv607")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=324481011]
+unique_name_in_owner = true
+stream = ExtResource("2_fv607")
+volume_db = -30.0
+mix_target = 1
+bus = &"Reverb bus"
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

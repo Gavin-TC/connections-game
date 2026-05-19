@@ -8,16 +8,20 @@
 [node name="Game" type="Node2D" unique_id=871261845 groups=["WorldRoot"]]
 script = ExtResource("1_lbhrr")
 
-[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1935063850]
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=965963268]
 unique_name_in_owner = true
 stream = ExtResource("1_lnu2h")
-volume_db = -10.0
+volume_db = -25.0
+pitch_scale = 0.75
+autoplay = true
 bus = &"Reverb bus"
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=1638353685]
-color = Color(0.13216871, 0.23252025, 0.34879023, 1)
+visible = false
+color = Color(0.07775844, 0.14774674, 0.2316818, 1)
 
 [node name="MineManager" parent="." unique_id=1253030551 instance=ExtResource("1_yqjtg")]
+fog_of_war = true
 
 [node name="Player" parent="." unique_id=810700332 instance=ExtResource("2_yqjtg")]
 position = Vector2(193, 152)
